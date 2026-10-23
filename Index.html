@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中学数学 証明アシスタント - 相似な図形</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    /* Custom mathematical styling and responsiveness */
+    .math-font {
+      font-family: "Cambria Math", "Times New Roman", "Yu Mincho", serif;
+    }
+    /* Touch scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-teal-700 text-white shadow-md sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="bg-white/10 p-2 rounded-lg text-xl font-bold">📐</div>
+        <div>
+          <h1 class="text-lg md:text-xl font-bold tracking-tight">中学数学 証明アシスタント</h1>
+          <p class="text-xs text-teal-200">中学3年「5章 相似な図形」相似の証明ステップアップ</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-api-settings" class="text-xs bg-teal-800 hover:bg-teal-900 border border-teal-500/50 text-teal-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          <span class="hidden sm:inline">先生用設定</span>
+        </button>
+        <button id="btn-show-guide" class="text-xs bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
+          <span>💡 使い方</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+    <!-- Left Column: Problem & Figure (5 cols) -->
+    <section class="lg:col-span-5 flex flex-col gap-4">
+      
+      <!-- Problem Selector Card -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <label for="problem-select" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+          問題を選択する（全9問）
+        </label>
+        <select id="problem-select" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium">
+          <!-- Dynamically populated from 9 problems -->
+        </select>
+      </div>
+
+      <!-- Problem Statement & Figure Card -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col gap-3 flex-1">
+        
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <span id="problem-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">
+            Level 2-1
+          </span>
+          <div class="flex items-center gap-2">
+            <button id="btn-toggle-marks" class="text-xs px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1">
+              <span id="mark-icon">👁️</span> <span id="mark-text">図の印・長さを表示</span>
+            </button>
+          </div>
+        </div>
+
+        <h2 id="problem-title" class="text-base font-bold text-slate-800 leading-snug">
+          問題タイトル
+        </h2>
+
+        <p id="problem-text" class="text-sm text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200/80">
+          問題文がここに入ります。
+        </p>
+
+        <!-- Figure SVG Container -->
+        <div class="relative bg-slate-50 rounded-xl border border-slate-200 p-3 flex items-center justify-center min-h-[220px] max-h-[280px] overflow-hidden">
+          <div id="figure-container" class="w-full h-full flex items-center justify-center">
+            <!-- Dynamic SVG will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Hypotheses and Conclusion details: Accordion Dropdown (Closed by default) -->
+        <details id="details-hypo-conc" class="text-xs border border-slate-200 rounded-lg overflow-hidden bg-slate-50/70 transition">
+          <summary class="p-2.5 font-bold text-slate-700 cursor-pointer hover:bg-slate-100 flex items-center justify-between select-none">
+            <span class="flex items-center gap-1.5 text-teal-700">
+              <span>🔍</span>
+              <span>仮定と結論を確認する（ヒント）</span>
+            </span>
+            <span class="text-slate-400 text-xs font-normal">タップで表示 ▼</span>
+          </summary>
+          <div class="p-3 bg-white border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2.5">
+              <span class="font-bold text-emerald-800 flex items-center gap-1 mb-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                仮定（問題文・図から分かること）
+              </span>
+              <div id="problem-hypotheses" class="text-emerald-900 math-font font-medium space-y-0.5">
+                -
+              </div>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+              <span class="font-bold text-amber-800 flex items-center gap-1 mb-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                結論（証明したいこと）
+              </span>
+              <div id="problem-conclusion" class="text-amber-900 math-font font-medium">
+                -
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Similarity Conditions Reference Accordion -->
+        <details class="text-xs border border-slate-200 rounded-lg overflow-hidden bg-slate-50/50">
+          <summary class="p-2.5 font-bold text-slate-600 cursor-pointer hover:bg-slate-100 flex items-center justify-between select-none">
+            <span>📚 三角形の相似条件をおさらい</span>
+            <span class="text-slate-400">▼</span>
+          </summary>
+          <div class="p-3 bg-white border-t border-slate-200 text-slate-700 space-y-1.5 leading-relaxed">
+            <p class="font-semibold text-teal-700">1. 3組の辺の比がすべて等しい</p>
+            <p class="font-semibold text-teal-700">2. 2組の辺の比とその間の角がそれぞれ等しい</p>
+            <p class="font-semibold text-teal-700">3. 2組の角がそれぞれ等しい</p>
+          </div>
+        </details>
+
+      </div>
+    </section>
+
+    <!-- Right Column: Proof Workspace & Scaffolding Modes (7 cols) -->
+    <section class="lg:col-span-7 flex flex-col gap-4">
+      
+      <!-- Mode Tabs (Level 1, Level 2, Level 3) -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-1.5 flex gap-1">
+        <button id="tab-mode-1" class="mode-tab flex-1 py-2 px-3 rounded-lg text-xs md:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-teal-600 text-white shadow-sm">
+          <span>🌱</span>
+          <span>Lv.1 入門（穴埋め）</span>
+        </button>
+        <button id="tab-mode-2" class="mode-tab flex-1 py-2 px-3 rounded-lg text-xs md:text-sm font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-100">
+          <span>🌿</span>
+          <span>Lv.2 標準（ステップ型）</span>
+        </button>
+        <button id="tab-mode-3" class="mode-tab flex-1 py-2 px-3 rounded-lg text-xs md:text-sm font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-100">
+          <span>🌳</span>
+          <span>Lv.3 挑戦（自由記述+AI）</span>
+        </button>
+      </div>
+
+      <!-- WORKSPACE AREA -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex-1 flex flex-col">
+
+        <!-- ================= LEVEL 1: Fill-in-the-Blank Mode ================= -->
+        <div id="container-mode-1" class="mode-container space-y-4">
+          <div class="bg-teal-50 border border-teal-100 rounded-lg p-3 text-xs text-teal-900 leading-relaxed flex items-start gap-2">
+            <span class="text-base">💡</span>
+            <div>
+              <strong>ヒント選択で型を身につけよう！</strong><br>
+              選択肢を選んで、相似の証明の流れ（着目する2つの三角形 → 等しい比や角の根拠 → 相似条件 → 結論）を完成させましょう。
+            </div>
+          </div>
+
+          <form id="form-level1" class="space-y-4 text-sm text-slate-800 leading-loose">
+            <!-- Step 1: Triangles -->
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <span class="text-xs font-bold text-teal-700 block mb-1">【ステップ1：着目する三角形】</span>
+              <div class="flex flex-wrap items-center gap-2 math-font">
+                <span>△</span>
+                <select id="l1-tri1" class="bg-white border border-slate-300 rounded px-2 py-1 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-teal-500"></select>
+                <span>と △</span>
+                <select id="l1-tri2" class="bg-white border border-slate-300 rounded px-2 py-1 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-teal-500"></select>
+                <span>において、</span>
+              </div>
+            </div>
+
+            <!-- Step 2: Reasons and Equations / Ratios -->
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
+              <span class="text-xs font-bold text-teal-700 block">【ステップ2：等しい比や角とその理由】</span>
+
+              <!-- Reason 1 -->
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-bold text-slate-500">①</span>
+                <select id="l1-reason1" class="bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 focus:ring-2 focus:ring-teal-500"></select>
+                <span>より、</span>
+                <select id="l1-eq1" class="bg-white border border-slate-300 rounded px-2 py-1 text-sm font-bold math-font text-slate-800 focus:ring-2 focus:ring-teal-500"></select>
+                <span class="text-slate-400">… ①</span>
+              </div>
+
+              <!-- Reason 2 -->
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-bold text-slate-500">②</span>
+                <select id="l1-reason2" class="bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 focus:ring-2 focus:ring-teal-500"></select>
+                <span>より、</span>
+                <select id="l1-eq2" class="bg-white border border-slate-300 rounded px-2 py-1 text-sm font-bold math-font text-slate-800 focus:ring-2 focus:ring-teal-500"></select>
+                <span class="text-slate-400">… ②</span>
+              </div>
+
+              <!-- Reason 3 (Optional / Conditional) -->
+              <div id="l1-box-reason3" class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-bold text-slate-500">③</span>
+                <select id="l1-reason3" class="bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 focus:ring-2 focus:ring-teal-500"></select>
+                <span>より、</span>
+                <select id="l1-eq3" class="bg-white border border-slate-300 rounded px-2 py-1 text-sm font-bold math-font text-slate-800 focus:ring-2 focus:ring-teal-500"></select>
+                <span class="text-slate-400">… ③</span>
+              </div>
+            </div>
+
+            <!-- Step 3: Condition -->
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <span class="text-xs font-bold text-teal-700 block mb-1">【ステップ3：相似条件】</span>
+              <div class="space-y-1">
+                <span id="l1-cond-prefix">①, ②より、</span>
+                <select id="l1-condition" class="w-full bg-white border border-slate-300 rounded px-2 py-1.5 text-xs sm:text-sm font-medium text-slate-800 focus:ring-2 focus:ring-teal-500"></select>
+                <span>から、</span>
+              </div>
+            </div>
+
+            <!-- Step 4: Conclusion -->
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <span class="text-xs font-bold text-teal-700 block mb-1">【ステップ4：結論】</span>
+              <div class="flex flex-wrap items-center gap-2 math-font">
+                <select id="l1-conclusion" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-teal-500"></select>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+              <button type="button" id="btn-check-l1" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-4 rounded-lg shadow transition text-sm flex items-center justify-center gap-1.5">
+                <span>✅</span> 答え合わせをする
+              </button>
+              <button type="button" id="btn-reset-l1" class="px-4 py-2.5 border border-slate-300 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium transition">
+                リセット
+              </button>
+            </div>
+          </form>
+
+          <!-- Result Feedback Box -->
+          <div id="l1-feedback" class="hidden rounded-lg p-4 text-sm leading-relaxed"></div>
+        </div>
+
+        <!-- ================= LEVEL 2: Step-by-Step Guided Input ================= -->
+        <div id="container-mode-2" class="mode-container hidden space-y-4">
+          <div class="bg-teal-50 border border-teal-100 rounded-lg p-3 text-xs text-teal-900 leading-relaxed flex items-start gap-2">
+            <span class="text-base">🌿</span>
+            <div>
+              <strong>ステップごとに自分で書いてみよう！</strong><br>
+              それぞれのステップの入力欄にキーボードで入力してください。「ヒント」ボタンを押すとヒントが表示されます。
+            </div>
+          </div>
+
+          <div class="space-y-4 text-sm">
+            <!-- Step 1 Guide -->
+            <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-bold text-teal-700">① 着目する三角形の宣言</span>
+                <button type="button" class="btn-step-hint text-xs text-teal-600 hover:text-teal-800 underline" data-hint="step1">💡 ヒント</button>
+              </div>
+              <p class="text-xs text-slate-500 mb-2">どの2つの三角形について相似を言いたいかを書きましょう（対応する頂点の順に注意！）。</p>
+              <input type="text" id="l2-input-step1" placeholder="△◯◯ と △△△ において、" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+              <div id="hint-box-step1" class="hidden mt-2 p-2 bg-yellow-50 text-yellow-800 text-xs rounded border border-yellow-200"></div>
+            </div>
+
+            <!-- Step 2 Guide -->
+            <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-bold text-teal-700">② 等しい比や角の根拠</span>
+                <button type="button" class="btn-step-hint text-xs text-teal-600 hover:text-teal-800 underline" data-hint="step2">💡 ヒント</button>
+              </div>
+              <p class="text-xs text-slate-500 mb-2">「仮定より」「共通な角だから」「対頂角は等しいから」などの理由と、等しい比や角の式を書きます。</p>
+              <textarea id="l2-input-step2" rows="4" placeholder="（理由）より、（等式または比） … ①&#10;（理由）より、（等式または比） … ②" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none font-mono"></textarea>
+              <div id="hint-box-step2" class="hidden mt-2 p-2 bg-yellow-50 text-yellow-800 text-xs rounded border border-yellow-200"></div>
+            </div>
+
+            <!-- Step 3 Guide -->
+            <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-bold text-teal-700">③ 相似条件</span>
+                <button type="button" class="btn-step-hint text-xs text-teal-600 hover:text-teal-800 underline" data-hint="step3">💡 ヒント</button>
+              </div>
+              <p class="text-xs text-slate-500 mb-2">集めた根拠から言える三角形の相似条件を正確に書きましょう。</p>
+              <input type="text" id="l2-input-step3" placeholder="①, ②より、（あてはまる相似条件）から、" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+              <div id="hint-box-step3" class="hidden mt-2 p-2 bg-yellow-50 text-yellow-800 text-xs rounded border border-yellow-200"></div>
+            </div>
+
+            <!-- Step 4 Guide -->
+            <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-bold text-teal-700">④ 結論</span>
+                <button type="button" class="btn-step-hint text-xs text-teal-600 hover:text-teal-800 underline" data-hint="step4">💡 ヒント</button>
+              </div>
+              <input type="text" id="l2-input-step4" placeholder="△◯◯ ∽ △△△" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+              <div id="hint-box-step4" class="hidden mt-2 p-2 bg-yellow-50 text-yellow-800 text-xs rounded border border-yellow-200"></div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button type="button" id="btn-merge-to-l3" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-lg shadow transition text-sm flex items-center justify-center gap-1.5">
+                <span>📝</span> この内容をまとめてLv.3（自由記述）へ送る
+              </button>
+              <button type="button" id="btn-check-l2" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-4 rounded-lg shadow transition text-sm flex items-center justify-center gap-1.5">
+                <span>🔍</span> 各ステップを確認
+              </button>
+            </div>
+            <div id="l2-feedback" class="hidden rounded-lg p-4 text-sm leading-relaxed"></div>
+          </div>
+        </div>
+
+        <!-- ================= LEVEL 3: Free Writing & AI Wall ================= -->
+        <div id="container-mode-3" class="mode-container hidden flex-1 flex flex-col gap-3">
+          
+          <!-- Helper Math Symbols Palette for iPad Touch -->
+          <div class="bg-slate-100 p-2 rounded-lg border border-slate-200 flex flex-wrap items-center gap-1.5">
+            <span class="text-xs font-bold text-slate-500 mr-1">記号パレット:</span>
+            <button type="button" class="btn-symbol px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-xs font-bold text-teal-700 shadow-sm transition">△</button>
+            <button type="button" class="btn-symbol px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-xs font-bold text-teal-700 shadow-sm transition">∽</button>
+            <button type="button" class="btn-symbol px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-xs font-bold text-teal-700 shadow-sm transition">∠</button>
+            <button type="button" class="btn-symbol px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-xs font-bold text-teal-700 shadow-sm transition">:</button>
+            <button type="button" class="btn-symbol px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-xs font-bold text-teal-700 shadow-sm transition">＝</button>
+            <button type="button" class="btn-symbol px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-xs font-bold text-teal-700 shadow-sm transition">①</button>
+            <button type="button" class="btn-symbol px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-xs font-bold text-teal-700 shadow-sm transition">②</button>
+            <button type="button" class="btn-symbol px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-xs font-bold text-teal-700 shadow-sm transition">③</button>
+            <button type="button" class="btn-symbol px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-xs font-bold text-teal-700 shadow-sm transition">より、</button>
+            <button type="button" class="btn-symbol px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-xs font-bold text-teal-700 shadow-sm transition">において、</button>
+          </div>
+
+          <!-- Free Writing Textarea -->
+          <div class="flex-1 flex flex-col">
+            <label for="l3-textarea" class="text-xs font-bold text-slate-600 mb-1 flex items-center justify-between">
+              <span>【証明の記述エリア】ノートに書くように一から書いてみよう</span>
+              <span id="char-count" class="text-slate-400 font-normal">0 文字</span>
+            </label>
+            <textarea id="l3-textarea" rows="7" placeholder="証明をここに入力してください。&#10;&#10;【構成の目安】&#10;1. 着目する2つの三角形（△… と △… において、）&#10;2. 等しい比や角の根拠（… ①, ②）&#10;3. 相似条件（①, ②より、… から、）&#10;4. 結論（△… ∽ △…）&#10;&#10;※困ったときは、下の『AIと壁打ちする』ボタンを押してヒントをもらおう！" class="w-full flex-1 bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-teal-500 focus:bg-white focus:outline-none font-mono leading-relaxed resize-y"></textarea>
+          </div>
+
+          <!-- Wall-hitting / Advice Trigger Buttons -->
+          <div class="space-y-2">
+            <div class="text-xs font-bold text-slate-500">💬 AIと壁打ちする（困ったことや確認したいことを選んでね）:</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button type="button" class="btn-quick-ask bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 text-xs font-medium py-2 px-2.5 rounded-lg transition text-center" data-question="start">
+                🏁 書き始めのヒント
+              </button>
+              <button type="button" class="btn-quick-ask bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 text-xs font-medium py-2 px-2.5 rounded-lg transition text-center" data-question="reasons">
+                🔍 比や角の書き方チェック
+              </button>
+              <button type="button" class="btn-quick-ask bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 text-xs font-medium py-2 px-2.5 rounded-lg transition text-center" data-question="condition">
+                📐 相似条件の相談
+              </button>
+              <button type="button" class="btn-quick-ask bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold py-2 px-2.5 rounded-lg transition text-center shadow-sm" data-question="full">
+                ✨ 全体添削＆壁打ち
+              </button>
+            </div>
+          </div>
+
+          <!-- AI Chat & Feedback Log -->
+          <div id="ai-chat-box" class="bg-slate-50 rounded-lg border border-slate-200 p-3 flex flex-col gap-2 max-h-[220px] overflow-y-auto">
+            <div class="flex items-start gap-2 text-xs">
+              <div class="w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0">AI</div>
+              <div class="bg-white border border-slate-200 rounded-lg p-2.5 text-slate-700 shadow-sm leading-relaxed">
+                こんにちは！相似の証明をサポートするAIです。証明を少しずつ書いてみて、困ったことや「これで合ってる？」と思う部分があれば、上のボタンを押すか直接聞いてくださいね。ヒントを出しながら一緒にゴールを目指します！
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Question Input to AI -->
+          <div class="flex items-center gap-2">
+            <input type="text" id="ai-custom-input" placeholder="AIに直接質問する（例：辺の比の書き方がわかりません）" class="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs sm:text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+            <button type="button" id="btn-send-custom-ai" class="bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-lg transition shrink-0 flex items-center gap-1">
+              <span>送信</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal: Password Auth for Teacher Settings -->
+  <div id="modal-auth" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+          <span>🔒</span> 先生用パスワード確認
+        </h3>
+        <button id="btn-close-auth" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">×</button>
+      </div>
+      <p class="text-xs text-slate-600 mb-3">
+        設定画面を開くには先生用のパスワードを入力してください。<br>
+        <span class="text-teal-600 font-medium">（初期パスワード：math）</span>
+      </p>
+      <form id="form-auth" class="space-y-3">
+        <div>
+          <input type="password" id="input-auth-pass" placeholder="パスワードを入力" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+          <p id="auth-error-msg" class="hidden text-rose-600 text-xs mt-1 font-semibold">パスワードが正しくありません。</p>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-1">
+          <button type="button" id="btn-cancel-auth" class="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 text-xs hover:bg-slate-100 transition">
+            キャンセル
+          </button>
+          <button type="submit" id="btn-submit-auth" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs transition shadow-sm">
+            認証する
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: API Key Settings (Protected by Teacher Auth) -->
+  <div id="modal-settings" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+          <span>⚙️</span> Gemini API 設定（教員用/オプション）
+        </h3>
+        <button id="btn-close-settings" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">×</button>
+      </div>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+        <p>
+          本アプリは<strong>APIキーなしでも内蔵の自動添削エンジン（ソクラテス式ヒント判定）</strong>が完全動作します。
+        </p>
+        <p>
+          さらに高度で柔軟な対話（Gemini 1.5 Flash等）を行いたい場合は、Google AI Studioで取得したAPIキーを入力してください（ブラウザ内にのみ安全に保存されます）。
+        </p>
+        <div>
+          <label for="input-api-key" class="block font-bold text-slate-700 mb-1">Gemini API Key:</label>
+          <input type="password" id="input-api-key" placeholder="AIzaSy..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 font-mono text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+        </div>
+
+        <div class="pt-2 border-t border-slate-100">
+          <label for="input-change-pass" class="block font-bold text-slate-700 mb-1">先生用パスワードの変更（任意）:</label>
+          <input type="password" id="input-change-pass" placeholder="新しいパスワード（空欄なら変更なし）" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 font-mono text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <button id="btn-clear-api-key" class="text-red-600 hover:text-red-700 text-xs font-semibold">
+            APIキーを削除
+          </button>
+          <button id="btn-save-api-key" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-4 py-2 rounded-lg transition text-xs sm:text-sm shadow-sm">
+            設定を保存する
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: User Guide -->
+  <div id="modal-guide" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+          <span>💡</span> 相似な図形 証明アシスタントの使い方
+        </h3>
+        <button id="btn-close-guide" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">×</button>
+      </div>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-700 leading-relaxed">
+        <div>
+          <h4 class="font-bold text-teal-700 mb-1">1. 自分に合ったレベルを選ぼう</h4>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><strong>Lv.1 入門（穴埋め）</strong>：まだ一言も書けない人向け。選択肢を選んで相似の証明の流れをマスター！</li>
+            <li><strong>Lv.2 標準（ステップ型）</strong>：型に沿って1つずつ枠の中に書いていく練習。ヒントボタンもあります。</li>
+            <li><strong>Lv.3 挑戦（自由記述+AI）</strong>：ノートと同じように自由に書きます。困ったら「AI壁打ち」でアドバイスをもらえます。</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-teal-700 mb-1">2. 三角形の相似条件（3つ）</h4>
+          <ol class="list-decimal pl-5 space-y-1">
+            <li><strong>3組の辺の比がすべて等しい</strong></li>
+            <li><strong>2組の辺の比とその間の角がそれぞれ等しい</strong></li>
+            <li><strong>2組の角がそれぞれ等しい</strong>（※最もよく使われます！）</li>
+          </ol>
+        </div>
+        <div>
+          <h4 class="font-bold text-teal-700 mb-1">3. 証明の基本の4ステップ</h4>
+          <ol class="list-decimal pl-5 space-y-1">
+            <li>どの2つの三角形に注目するか宣言する（△◯◯と△△△において）</li>
+            <li>等しい辺の比や角の理由と式を見つける（共通な角、対頂角、仮定など）</li>
+            <li>当てはまる三角形の相似条件を言う</li>
+            <li>結論を結ぶ（△◯◯ ∽ △△△）</li>
+          </ol>
+        </div>
+      </div>
+      <div class="mt-5 text-right">
+        <button id="btn-dismiss-guide" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-4 py-2 rounded-lg transition text-xs sm:text-sm">
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    // --- Data: 9 Similarity Problems (Grade 9 Chapter 5) from Teacher's Handout ---
+    const PROBLEMS = [
+      {
+        id: "prob1",
+        badge: "Level 2-1",
+        badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+        title: "2組の辺の比とその間の角（基本）",
+        text: "下の図で、辺AB上に点D、辺AC上に点Eがあり、AB = 6, AD = 4, AC = 8, AE = 3 である。このとき、△ABC ∽ △AED であることを証明しなさい。",
+        hypotheses: ["AB = 6, AD = 4", "AC = 8, AE = 3", "∠Aは共通"],
+        conclusion: "△ABC ∽ △AED",
+        tri1: "ABC",
+        tri2: "AED",
+        condCount: 2, // 2組の辺の比 + 1間の角 (①, ②, ③)
+        condition: "2組の辺の比とその間の角がそれぞれ等しい",
+        reasons: [
+          { type: "仮定より", eq: "AB : AE = 2 : 1", side: "比" },
+          { type: "仮定より", eq: "AC : AD = 2 : 1", side: "比" },
+          { type: "共通な角だから", eq: "∠BAC = ∠EAD", side: "角" }
+        ],
+        svg: function(showMarks) {
+          return `
+            <svg viewBox="0 0 320 220" class="w-full h-full max-h-[220px]">
+              <!-- Triangle ABC: A(140, 25), B(50, 180), C(270, 180) -->
+              <!-- D on AB (t=4/6=0.667): D(80, 128) -->
+              <!-- E on AC (t=3/8=0.375): E(189, 83) -->
+              <polygon points="140,25 50,180 270,180" fill="none" stroke="#334155" stroke-width="2" />
+              <line x1="80" y1="128" x2="189" y2="83" stroke="#0d9488" stroke-width="2.5" />
+
+              <!-- Points & Labels -->
+              <circle cx="140" cy="25" r="4" fill="#1e293b" />
+              <text x="135" y="18" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">A</text>
+
+              <circle cx="50" cy="180" r="4" fill="#1e293b" />
+              <text x="35" y="195" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">B</text>
+
+              <circle cx="270" cy="180" r="4" fill="#1e293b" />
+              <text x="275" y="195" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">C</text>
+
+              <circle cx="80" cy="128" r="4" fill="#1e293b" />
+              <text x="60" y="132" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">D</text>
+
+              <circle cx="189" cy="83" r="4" fill="#1e293b" />
+              <text x="198" y="85" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">E</text>
+
+              <!-- Length Indicators -->
+              <text x="100" y="75" font-size="12" fill="#64748b" font-weight="bold">4</text>
+              <text x="170" y="50" font-size="12" fill="#64748b" font-weight="bold">3</text>
+
+              <!-- Dashed curves for total lengths -->
+              <path d="M 40,170 Q 30,95 125,25" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3,3" />
+              <text x="35" y="105" font-size="12" font-weight="bold" fill="#0284c7">6</text>
+
+              <path d="M 155,20 Q 230,85 275,170" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3,3" />
+              <text x="235" y="85" font-size="12" font-weight="bold" fill="#0284c7">8</text>
+
+              ${showMarks ? `
+                <!-- Common angle A -->
+                <path d="M 128 45 A 24 24 0 0 1 155 40" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <text x="135" y="60" font-size="10" fill="#10b981" font-weight="bold">共通</text>
+              ` : ''}
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "prob2",
+        badge: "Level 2-2",
+        badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        title: "2組の角がそれぞれ等しい（50°と共通角）",
+        text: "下の図で、辺AB上に点D、辺AC上に点Eがあり、∠ADE = 50°, ∠B = 50° である。このとき、△ADE ∽ △ABC であることを証明しなさい。",
+        hypotheses: ["∠ADE = 50°", "∠ABC = 50°", "∠Aは共通"],
+        conclusion: "△ADE ∽ △ABC",
+        tri1: "ADE",
+        tri2: "ABC",
+        condCount: 2,
+        condition: "2組の角がそれぞれ等しい",
+        reasons: [
+          { type: "仮定より", eq: "∠ADE = ∠ABC", side: "角" },
+          { type: "共通な角だから", eq: "∠DAE = ∠BAC", side: "角" }
+        ],
+        svg: function(showMarks) {
+          return `
+            <svg viewBox="0 0 320 220" class="w-full h-full max-h-[220px]">
+              <!-- Triangle ABC: A(220, 25), B(60, 180), C(250, 180) -->
+              <!-- D on AB at (140, 102), E on AC at (235, 102) -->
+              <polygon points="220,25 60,180 250,180" fill="none" stroke="#334155" stroke-width="2" />
+              <line x1="140" y1="102" x2="235" y2="102" stroke="#0d9488" stroke-width="2.5" />
+
+              <circle cx="220" cy="25" r="4" fill="#1e293b" />
+              <text x="220" y="18" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">A</text>
+
+              <circle cx="60" cy="180" r="4" fill="#1e293b" />
+              <text x="45" y="195" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">B</text>
+
+              <circle cx="250" cy="180" r="4" fill="#1e293b" />
+              <text x="258" y="195" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">C</text>
+
+              <circle cx="140" cy="102" r="4" fill="#1e293b" />
+              <text x="120" y="105" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">D</text>
+
+              <circle cx="235" cy="102" r="4" fill="#1e293b" />
+              <text x="245" y="105" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">E</text>
+
+              <!-- Angle 50deg marks -->
+              <text x="155" y="98" font-size="12" font-weight="bold" fill="#f59e0b">50°</text>
+              <path d="M 160 102 A 20 20 0 0 1 152 114" fill="none" stroke="#f59e0b" stroke-width="2" />
+
+              <text x="85" y="172" font-size="12" font-weight="bold" fill="#f59e0b">50°</text>
+              <path d="M 85 180 A 25 25 0 0 1 78 162" fill="none" stroke="#f59e0b" stroke-width="2" />
+
+              ${showMarks ? `
+                <!-- Common angle A -->
+                <path d="M 205 38 A 20 20 0 0 1 223 45" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <text x="195" y="55" font-size="10" fill="#10b981" font-weight="bold">共通</text>
+              ` : ''}
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "prob3",
+        badge: "Level 3-3",
+        badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
+        title: "直角と共通な角の相似証明",
+        text: "直角三角形ABC（∠BAC = 90°）で、辺BC上に点D、辺AC上に点Eがあり、DE ⊥ BC である。このとき、△CDE ∽ △CAB であることを証明しなさい。",
+        hypotheses: ["∠BAC = 90°", "DE ⊥ BC（∠CDE = 90°）", "∠Cは共通"],
+        conclusion: "△CDE ∽ △CAB",
+        tri1: "CDE",
+        tri2: "CAB",
+        condCount: 2,
+        condition: "2組の角がそれぞれ等しい",
+        reasons: [
+          { type: "仮定より", eq: "∠CDE = ∠CAB", side: "角" },
+          { type: "共通な角だから", eq: "∠DCE = ∠ACB", side: "角" }
+        ],
+        svg: function(showMarks) {
+          return `
+            <svg viewBox="0 0 320 220" class="w-full h-full max-h-[220px]">
+              <!-- A(180, 40), B(60, 100), C(260, 190) -->
+              <!-- DE perpendicular to BC. D(190, 150), E(210, 95) on AC -->
+              <polygon points="180,40 60,100 260,190" fill="none" stroke="#334155" stroke-width="2" />
+              <line x1="190" y1="150" x2="210" y2="95" stroke="#0d9488" stroke-width="2.5" />
+
+              <circle cx="180" cy="40" r="4" fill="#1e293b" />
+              <text x="180" y="30" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">A</text>
+
+              <circle cx="60" cy="100" r="4" fill="#1e293b" />
+              <text x="45" y="105" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">B</text>
+
+              <circle cx="260" cy="190" r="4" fill="#1e293b" />
+              <text x="268" y="195" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">C</text>
+
+              <circle cx="190" cy="150" r="4" fill="#1e293b" />
+              <text x="175" y="165" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">D</text>
+
+              <circle cx="210" cy="95" r="4" fill="#1e293b" />
+              <text x="220" y="95" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">E</text>
+
+              <!-- Right angle at A -->
+              <path d="M 172 44 L 176 52 L 184 48" fill="none" stroke="#ef4444" stroke-width="1.8" />
+
+              <!-- Right angle at D -->
+              <path d="M 184 147 L 188 139 L 194 142" fill="none" stroke="#ef4444" stroke-width="1.8" />
+
+              ${showMarks ? `
+                <!-- Common angle C -->
+                <path d="M 235 180 A 25 25 0 0 1 245 165" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <text x="220" y="170" font-size="10" fill="#10b981" font-weight="bold">共通</text>
+              ` : ''}
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "prob4",
+        badge: "Level 2-4",
+        badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+        title: "対頂角と2組の辺の比（交差する線分）",
+        text: "下の図のように、線分ADと線分BCが点Eで交わっており、AE = 3, ED = 6, BE = 2, EC = 4 である。このとき、△EAB ∽ △EDC であることを証明しなさい。",
+        hypotheses: ["AE = 3, ED = 6", "BE = 2, EC = 4", "対頂角は等しい"],
+        conclusion: "△EAB ∽ △EDC",
+        tri1: "EAB",
+        tri2: "EDC",
+        condCount: 2,
+        condition: "2組の辺の比とその間の角がそれぞれ等しい",
+        reasons: [
+          { type: "仮定より", eq: "AE : ED = 1 : 2", side: "比" },
+          { type: "仮定より", eq: "BE : EC = 1 : 2", side: "比" },
+          { type: "対頂角は等しいから", eq: "∠AEB = ∠DEC", side: "角" }
+        ],
+        svg: function(showMarks) {
+          return `
+            <svg viewBox="0 0 320 220" class="w-full h-full max-h-[220px]">
+              <!-- E at (140, 110) -->
+              <!-- A(60, 70), D(260, 170) -> AE:ED = 3:6 = 1:2 -->
+              <!-- B(100, 170), C(200, 20) -> BE:EC = 2:4 = 1:2 -->
+              <line x1="60" y1="70" x2="260" y2="170" stroke="#334155" stroke-width="2" />
+              <line x1="100" y1="170" x2="200" y2="20" stroke="#334155" stroke-width="2" />
+              <line x1="60" y1="70" x2="100" y2="170" stroke="#0d9488" stroke-width="2.5" />
+              <line x1="200" y1="20" x2="260" y2="170" stroke="#0d9488" stroke-width="2.5" />
+
+              <circle cx="60" cy="70" r="4" fill="#1e293b" />
+              <text x="45" y="72" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">A</text>
+
+              <circle cx="100" cy="170" r="4" fill="#1e293b" />
+              <text x="85" y="190" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">B</text>
+
+              <circle cx="140" cy="110" r="4" fill="#1e293b" />
+              <text x="148" y="125" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">E</text>
+
+              <circle cx="200" cy="20" r="4" fill="#1e293b" />
+              <text x="200" y="12" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">C</text>
+
+              <circle cx="260" cy="170" r="4" fill="#1e293b" />
+              <text x="270" y="175" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">D</text>
+
+              <!-- Length annotations -->
+              <text x="92" y="85" font-size="12" font-weight="bold" fill="#0284c7">3</text>
+              <text x="200" y="150" font-size="12" font-weight="bold" fill="#0284c7">6</text>
+              <text x="115" y="150" font-size="12" font-weight="bold" fill="#0284c7">2</text>
+              <text x="170" y="60" font-size="12" font-weight="bold" fill="#0284c7">4</text>
+
+              ${showMarks ? `
+                <!-- Vertical angles at E -->
+                <path d="M 125 102 A 18 18 0 0 1 130 125" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <path d="M 155 118 A 18 18 0 0 1 150 95" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <text x="145" y="80" font-size="10" fill="#10b981" font-weight="bold">対頂角</text>
+              ` : ''}
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "prob5",
+        badge: "Level 2-5",
+        badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+        title: "直角三角形と斜辺への垂線（教科書例2）",
+        text: "∠A = 90° である直角三角形ABCで、点Aから辺BCに垂線ADをひきます。このとき、△ABC ∽ △DBA となることを証明しなさい。",
+        hypotheses: ["∠BAC = 90°", "AD ⊥ BC（∠BDA = 90°）", "∠Bは共通"],
+        conclusion: "△ABC ∽ △DBA",
+        tri1: "ABC",
+        tri2: "DBA",
+        condCount: 2,
+        condition: "2組の角がそれぞれ等しい",
+        reasons: [
+          { type: "仮定より", eq: "∠BAC = ∠BDA", side: "角" },
+          { type: "共通な角だから", eq: "∠ABC = ∠DBA", side: "角" }
+        ],
+        svg: function(showMarks) {
+          return `
+            <svg viewBox="0 0 320 220" class="w-full h-full max-h-[220px]">
+              <!-- Right triangle ABC with right angle at A(160, 40) -->
+              <!-- B(50, 170), C(270, 170). BC is horizontal on y=170 -->
+              <!-- AD perpendicular to BC -> D(160, 170) -->
+              <polygon points="160,40 50,170 270,170" fill="none" stroke="#334155" stroke-width="2" />
+              <line x1="160" y1="40" x2="160" y2="170" stroke="#0d9488" stroke-width="2.5" />
+
+              <circle cx="160" cy="40" r="4" fill="#1e293b" />
+              <text x="160" y="30" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">A</text>
+
+              <circle cx="50" cy="170" r="4" fill="#1e293b" />
+              <text x="35" y="185" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">B</text>
+
+              <circle cx="160" cy="170" r="4" fill="#1e293b" />
+              <text x="156" y="192" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">D</text>
+
+              <circle cx="270" cy="170" r="4" fill="#1e293b" />
+              <text x="278" y="185" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">C</text>
+
+              <!-- Right angle at A -->
+              <path d="M 152 49 L 161 57 L 169 48" fill="none" stroke="#ef4444" stroke-width="1.8" />
+
+              <!-- Right angle at D -->
+              <path d="M 150 170 L 150 160 L 160 160" fill="none" stroke="#ef4444" stroke-width="1.8" />
+
+              ${showMarks ? `
+                <!-- Common angle B -->
+                <path d="M 75 170 A 25 25 0 0 1 70 148" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <text x="80" y="155" font-size="10" fill="#10b981" font-weight="bold">共通</text>
+              ` : ''}
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "prob6",
+        badge: "Level 2-6",
+        badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        title: "三角形の2本の垂線（教科書問5）",
+        text: "△ABCで、点B, Cから辺AC, ABにそれぞれ垂線BD, CEをひきます。このとき、△ABD ∽ △ACE となることを証明しなさい。",
+        hypotheses: ["BD ⊥ AC（∠ADB = 90°）", "CE ⊥ AB（∠AEC = 90°）", "∠Aは共通"],
+        conclusion: "△ABD ∽ △ACE",
+        tri1: "ABD",
+        tri2: "ACE",
+        condCount: 2,
+        condition: "2組の角がそれぞれ等しい",
+        reasons: [
+          { type: "仮定より", eq: "∠ADB = ∠AEC", side: "角" },
+          { type: "共通な角だから", eq: "∠BAD = ∠CAE", side: "角" }
+        ],
+        svg: function(showMarks) {
+          return `
+            <svg viewBox="0 0 320 220" class="w-full h-full max-h-[220px]">
+              <!-- Triangle ABC: A(160, 30), B(60, 180), C(260, 180) -->
+              <!-- BD perp to AC: D(215, 112) -->
+              <!-- CE perp to AB: E(105, 112) -->
+              <polygon points="160,30 60,180 260,180" fill="none" stroke="#334155" stroke-width="2" />
+              <line x1="60" y1="180" x2="215" y2="112" stroke="#0d9488" stroke-width="2.5" />
+              <line x1="260" y1="180" x2="105" y2="112" stroke="#0d9488" stroke-width="2.5" />
+
+              <circle cx="160" cy="30" r="4" fill="#1e293b" />
+              <text x="160" y="20" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">A</text>
+
+              <circle cx="60" cy="180" r="4" fill="#1e293b" />
+              <text x="45" y="195" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">B</text>
+
+              <circle cx="260" cy="180" r="4" fill="#1e293b" />
+              <text x="268" y="195" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">C</text>
+
+              <circle cx="215" cy="112" r="4" fill="#1e293b" />
+              <text x="225" y="115" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">D</text>
+
+              <circle cx="105" cy="112" r="4" fill="#1e293b" />
+              <text x="88" y="115" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">E</text>
+
+              <!-- Right angle marks at D and E -->
+              <path d="M 210 119 L 205 113 L 210 106" fill="none" stroke="#ef4444" stroke-width="1.8" />
+              <path d="M 110 119 L 115 113 L 110 106" fill="none" stroke="#ef4444" stroke-width="1.8" />
+
+              ${showMarks ? `
+                <!-- Common angle A -->
+                <path d="M 148 50 A 20 20 0 0 1 172 50" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <text x="150" y="70" font-size="10" fill="#10b981" font-weight="bold">共通</text>
+              ` : ''}
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "prob7",
+        badge: "Level 2-7",
+        badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
+        title: "角の指定と共通な角（教科書問3）",
+        text: "△ABCで、Dは辺AB上の点で、∠A = ∠BCD です。このとき、△ABC ∽ △CBD となることを証明しなさい。",
+        hypotheses: ["∠A = ∠BCD", "∠Bは共通"],
+        conclusion: "△ABC ∽ △CBD",
+        tri1: "ABC",
+        tri2: "CBD",
+        condCount: 2,
+        condition: "2組の角がそれぞれ等しい",
+        reasons: [
+          { type: "仮定より", eq: "∠BAC = ∠BCD", side: "角" },
+          { type: "共通な角だから", eq: "∠ABC = ∠CBD", side: "角" }
+        ],
+        svg: function(showMarks) {
+          return `
+            <svg viewBox="0 0 320 220" class="w-full h-full max-h-[220px]">
+              <!-- Triangle ABC: A(250, 30), B(50, 180), C(230, 180) -->
+              <!-- D on AB at (150, 105) -->
+              <polygon points="250,30 50,180 230,180" fill="none" stroke="#334155" stroke-width="2" />
+              <line x1="150" y1="105" x2="230" y2="180" stroke="#0d9488" stroke-width="2.5" />
+
+              <circle cx="250" cy="30" r="4" fill="#1e293b" />
+              <text x="250" y="20" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">A</text>
+
+              <circle cx="50" cy="180" r="4" fill="#1e293b" />
+              <text x="35" y="195" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">B</text>
+
+              <circle cx="230" cy="180" r="4" fill="#1e293b" />
+              <text x="238" y="195" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">C</text>
+
+              <circle cx="150" cy="105" r="4" fill="#1e293b" />
+              <text x="130" y="105" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">D</text>
+
+              ${showMarks ? `
+                <!-- Angle A and BCD marks -->
+                <path d="M 235 40 A 20 20 0 0 1 247 50" fill="none" stroke="#f59e0b" stroke-width="2.5" />
+                <path d="M 215 165 A 20 20 0 0 1 210 180" fill="none" stroke="#f59e0b" stroke-width="2.5" />
+
+                <!-- Common angle B -->
+                <path d="M 75 180 A 25 25 0 0 1 70 165" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <text x="80" y="160" font-size="10" fill="#10b981" font-weight="bold">共通</text>
+              ` : ''}
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "prob8",
+        badge: "Level 2-8",
+        badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+        title: "角度95°と共通な角の相似証明",
+        text: "下の図で、辺AC上に点Dがあり、∠ADB = 95°, ∠ABC = 95° である。このとき、△ABD ∽ △ACB であることを証明しなさい。",
+        hypotheses: ["∠ADB = 95°", "∠ABC = 95°", "∠Aは共通"],
+        conclusion: "△ABD ∽ △ACB",
+        tri1: "ABD",
+        tri2: "ACB",
+        condCount: 2,
+        condition: "2組の角がそれぞれ等しい",
+        reasons: [
+          { type: "仮定より", eq: "∠ADB = ∠ABC", side: "角" },
+          { type: "共通な角だから", eq: "∠DAB = ∠CAB", side: "角" }
+        ],
+        svg: function(showMarks) {
+          return `
+            <svg viewBox="0 0 320 220" class="w-full h-full max-h-[220px]">
+              <!-- Triangle ABC: A(60, 50), B(170, 180), C(270, 50) -->
+              <!-- AC is horizontal on y=50. D on AC at (150, 50) -->
+              <polygon points="60,50 170,180 270,50" fill="none" stroke="#334155" stroke-width="2" />
+              <line x1="170" y1="180" x2="150" y2="50" stroke="#0d9488" stroke-width="2.5" />
+
+              <circle cx="60" cy="50" r="4" fill="#1e293b" />
+              <text x="45" y="48" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">A</text>
+
+              <circle cx="170" cy="180" r="4" fill="#1e293b" />
+              <text x="170" y="200" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">B</text>
+
+              <circle cx="270" cy="50" r="4" fill="#1e293b" />
+              <text x="278" y="48" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">C</text>
+
+              <circle cx="150" cy="50" r="4" fill="#1e293b" />
+              <text x="145" y="40" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">D</text>
+
+              <!-- Angle 95deg at D and B -->
+              <text x="110" y="70" font-size="12" font-weight="bold" fill="#f59e0b">95°</text>
+              <path d="M 135 50 A 20 20 0 0 0 152 70" fill="none" stroke="#f59e0b" stroke-width="2" />
+
+              <text x="180" y="150" font-size="12" font-weight="bold" fill="#f59e0b">95°</text>
+              <path d="M 152 160 A 25 25 0 0 1 185 160" fill="none" stroke="#f59e0b" stroke-width="2" />
+
+              ${showMarks ? `
+                <!-- Common angle A -->
+                <path d="M 80 50 A 20 20 0 0 1 73 66" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <text x="85" y="75" font-size="10" fill="#10b981" font-weight="bold">共通</text>
+              ` : ''}
+            </svg>
+          `;
+        }
+      },
+      {
+        id: "prob9",
+        badge: "Level 2-9",
+        badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+        title: "対頂角と辺の比（比1:2・交差図形）",
+        text: "下の図で、線分ABと線分CDが点Eで交わっており、AE = 4, ED = 8, CE = 3, EB = 6 である。このとき、△AEC ∽ △DEB であることを証明しなさい。",
+        hypotheses: ["AE = 4, ED = 8", "CE = 3, EB = 6", "対頂角は等しい"],
+        conclusion: "△AEC ∽ △DEB",
+        tri1: "AEC",
+        tri2: "DEB",
+        condCount: 2,
+        condition: "2組の辺の比とその間の角がそれぞれ等しい",
+        reasons: [
+          { type: "仮定より", eq: "AE : DE = 1 : 2", side: "比" },
+          { type: "仮定より", eq: "CE : BE = 1 : 2", side: "比" },
+          { type: "対頂角は等しいから", eq: "∠AEC = ∠DEB", side: "角" }
+        ],
+        svg: function(showMarks) {
+          return `
+            <svg viewBox="0 0 320 220" class="w-full h-full max-h-[220px]">
+              <!-- E at (160, 110) -->
+              <!-- A(80, 70), B(240, 150) -> AE=4, EB=6 -->
+              <!-- C(110, 160), D(230, 40) -> CE=3, ED=8 -->
+              <line x1="80" y1="70" x2="240" y2="150" stroke="#334155" stroke-width="2" />
+              <line x1="110" y1="160" x2="230" y2="40" stroke="#334155" stroke-width="2" />
+              <line x1="80" y1="70" x2="110" y2="160" stroke="#0d9488" stroke-width="2.5" />
+              <line x1="240" y1="150" x2="230" y2="40" stroke="#0d9488" stroke-width="2.5" />
+
+              <circle cx="80" cy="70" r="4" fill="#1e293b" />
+              <text x="65" y="70" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">A</text>
+
+              <circle cx="110" cy="160" r="4" fill="#1e293b" />
+              <text x="95" y="180" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">C</text>
+
+              <circle cx="160" cy="110" r="4" fill="#1e293b" />
+              <text x="165" y="125" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">E</text>
+
+              <circle cx="230" cy="40" r="4" fill="#1e293b" />
+              <text x="235" y="35" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">D</text>
+
+              <circle cx="240" cy="150" r="4" fill="#1e293b" />
+              <text x="245" y="165" font-size="14" font-weight="bold" fill="#1e293b" font-family="serif">B</text>
+
+              <!-- Length annotations -->
+              <text x="110" y="80" font-size="12" font-weight="bold" fill="#0284c7">4</text>
+              <text x="185" y="65" font-size="12" font-weight="bold" fill="#0284c7">8</text>
+              <text x="125" y="145" font-size="12" font-weight="bold" fill="#0284c7">3</text>
+              <text x="195" y="145" font-size="12" font-weight="bold" fill="#0284c7">6</text>
+
+              ${showMarks ? `
+                <!-- Vertical angles at E -->
+                <path d="M 145 98 A 18 18 0 0 1 148 122" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <path d="M 175 122 A 18 18 0 0 1 172 98" fill="none" stroke="#10b981" stroke-width="2.5" />
+                <text x="165" y="85" font-size="10" fill="#10b981" font-weight="bold">対頂角</text>
+              ` : ''}
+            </svg>
+          `;
+        }
+      }
+    ];
+
+    // --- State ---
+    let currentProblem = PROBLEMS[0];
+    let showMarks = false;
+    let currentMode = 1;
+    let apiKey = "";
+    let teacherPassword = "math";
+
+    try {
+      apiKey = localStorage.getItem("gemini_proof_api_key") || "";
+      teacherPassword = localStorage.getItem("gemini_teacher_password") || "math";
+    } catch (e) {
+      console.warn("localStorage disabled");
+    }
+
+    // --- DOM Elements ---
+    const problemSelect = document.getElementById("problem-select");
+    const problemBadge = document.getElementById("problem-badge");
+    const problemTitle = document.getElementById("problem-title");
+    const problemText = document.getElementById("problem-text");
+    const figureContainer = document.getElementById("figure-container");
+    const problemHypotheses = document.getElementById("problem-hypotheses");
+    const problemConclusion = document.getElementById("problem-conclusion");
+    const detailsHypoConc = document.getElementById("details-hypo-conc");
+    const btnToggleMarks = document.getElementById("btn-toggle-marks");
+    const markText = document.getElementById("mark-text");
+
+    const tabMode1 = document.getElementById("tab-mode-1");
+    const tabMode2 = document.getElementById("tab-mode-2");
+    const tabMode3 = document.getElementById("tab-mode-3");
+    const containerMode1 = document.getElementById("container-mode-1");
+    const containerMode2 = document.getElementById("container-mode-2");
+    const containerMode3 = document.getElementById("container-mode-3");
+
+    // Level 1 Elements
+    const l1Tri1 = document.getElementById("l1-tri1");
+    const l1Tri2 = document.getElementById("l1-tri2");
+    const l1Reason1 = document.getElementById("l1-reason1");
+    const l1Eq1 = document.getElementById("l1-eq1");
+    const l1Reason2 = document.getElementById("l1-reason2");
+    const l1Eq2 = document.getElementById("l1-eq2");
+    const l1BoxReason3 = document.getElementById("l1-box-reason3");
+    const l1Reason3 = document.getElementById("l1-reason3");
+    const l1Eq3 = document.getElementById("l1-eq3");
+    const l1CondPrefix = document.getElementById("l1-cond-prefix");
+    const l1Condition = document.getElementById("l1-condition");
+    const l1Conclusion = document.getElementById("l1-conclusion");
+    const btnCheckL1 = document.getElementById("btn-check-l1");
+    const btnResetL1 = document.getElementById("btn-reset-l1");
+    const l1Feedback = document.getElementById("l1-feedback");
+
+    // Level 2 Elements
+    const l2InputStep1 = document.getElementById("l2-input-step1");
+    const l2InputStep2 = document.getElementById("l2-input-step2");
+    const l2InputStep3 = document.getElementById("l2-input-step3");
+    const l2InputStep4 = document.getElementById("l2-input-step4");
+    const btnCheckL2 = document.getElementById("btn-check-l2");
+    const btnMergeToL3 = document.getElementById("btn-merge-to-l3");
+    const l2Feedback = document.getElementById("l2-feedback");
+
+    // Level 3 Elements
+    const l3Textarea = document.getElementById("l3-textarea");
+    const charCount = document.getElementById("char-count");
+    const aiChatBox = document.getElementById("ai-chat-box");
+    const aiCustomInput = document.getElementById("ai-custom-input");
+    const btnSendCustomAi = document.getElementById("btn-send-custom-ai");
+
+    // Teacher Auth & Settings Modals
+    const modalAuth = document.getElementById("modal-auth");
+    const formAuth = document.getElementById("form-auth");
+    const inputAuthPass = document.getElementById("input-auth-pass");
+    const authErrorMsg = document.getElementById("auth-error-msg");
+    const btnCloseAuth = document.getElementById("btn-close-auth");
+    const btnCancelAuth = document.getElementById("btn-cancel-auth");
+
+    const modalSettings = document.getElementById("modal-settings");
+    const btnApiSettings = document.getElementById("btn-api-settings");
+    const btnCloseSettings = document.getElementById("btn-close-settings");
+    const inputApiKey = document.getElementById("input-api-key");
+    const inputChangePass = document.getElementById("input-change-pass");
+    const btnSaveApiKey = document.getElementById("btn-save-api-key");
+    const btnClearApiKey = document.getElementById("btn-clear-api-key");
+
+    // Guide Modal
+    const modalGuide = document.getElementById("modal-guide");
+    const btnShowGuide = document.getElementById("btn-show-guide");
+    const btnCloseGuide = document.getElementById("btn-close-guide");
+    const btnDismissGuide = document.getElementById("btn-dismiss-guide");
+
+    // --- Init: Populate Problem Dropdown ---
+    PROBLEMS.forEach((p, index) => {
+      const opt = document.createElement("option");
+      opt.value = p.id;
+      opt.textContent = `問${index + 1}（${p.badge}）：${p.title}`;
+      problemSelect.appendChild(opt);
+    });
+
+    // --- Load Problem ---
+    function loadProblem(prob) {
+      currentProblem = prob;
+      problemBadge.textContent = prob.badge;
+      problemBadge.className = `px-2.5 py-0.5 rounded-full text-xs font-semibold border ${prob.badgeColor}`;
+      problemTitle.textContent = prob.title;
+      problemText.textContent = prob.text;
+
+      // Hypotheses & Conclusion (Default Closed)
+      detailsHypoConc.open = false;
+      problemHypotheses.innerHTML = prob.hypotheses.map(h => `<div>・${h}</div>`).join("");
+      problemConclusion.textContent = `・${prob.conclusion}`;
+
+      // Figure SVG
+      renderFigure();
+
+      // Reset & Setup Level 1 options
+      setupLevel1Options();
+      l1Feedback.className = "hidden";
+
+      // Reset Level 2 & 3
+      l2InputStep1.value = "";
+      l2InputStep2.value = "";
+      l2InputStep3.value = "";
+      l2InputStep4.value = "";
+      l2Feedback.className = "hidden";
+      document.querySelectorAll('[id^="hint-box-"]').forEach(el => el.classList.add("hidden"));
+
+      // Level 3
+      l3Textarea.value = "";
+      updateCharCount();
+
+      // Clear AI chat log except welcome message
+      aiChatBox.innerHTML = `
+        <div class="flex items-start gap-2 text-xs">
+          <div class="w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0">AI</div>
+          <div class="bg-white border border-slate-200 rounded-lg p-2.5 text-slate-700 shadow-sm leading-relaxed">
+            【${prob.title}】に切り替えました！何かわからないところがあれば、上のボタンやチャットでいつでも声をかけてね。
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFigure() {
+      figureContainer.innerHTML = currentProblem.svg(showMarks);
+    }
+
+    // --- Setup Level 1 Dropdown Options ---
+    function setupLevel1Options() {
+      const triOptions = ["選択してください", currentProblem.tri1, currentProblem.tri2, "ABC", "ADE", "AED", "DBA", "CBD", "ACE", "ABD", "EDC", "DEB"];
+      const uniqueTri = [...new Set(triOptions)];
+
+      const populateSelect = (el, arr) => {
+        el.innerHTML = "";
+        arr.forEach(val => {
+          const opt = document.createElement("option");
+          opt.value = val === "選択してください" ? "" : val;
+          opt.textContent = val;
+          el.appendChild(opt);
+        });
+      };
+
+      populateSelect(l1Tri1, uniqueTri);
+      populateSelect(l1Tri2, uniqueTri);
+
+      // Reasons
+      const reasonOptions = [
+        "選択してください",
+        "仮定より",
+        "共通な角だから",
+        "対頂角は等しいから",
+        "平行線の錯角は等しいから",
+        "直角（90°）だから"
+      ];
+      populateSelect(l1Reason1, reasonOptions);
+      populateSelect(l1Reason2, reasonOptions);
+      populateSelect(l1Reason3, reasonOptions);
+
+      // Equations / Ratios
+      const eqOptions = [
+        "選択してください",
+        ...currentProblem.reasons.map(r => r.eq),
+        "∠A = ∠A",
+        "∠B = ∠B",
+        "∠C = ∠C",
+        "AB : DE = 1 : 2",
+        "BC : EF = 1 : 2"
+      ];
+      const uniqueEq = [...new Set(eqOptions)];
+      populateSelect(l1Eq1, uniqueEq);
+      populateSelect(l1Eq2, uniqueEq);
+      populateSelect(l1Eq3, uniqueEq);
+
+      // Show/Hide Reason 3 based on problem reasons length
+      if (currentProblem.reasons.length >= 3) {
+        l1BoxReason3.classList.remove("hidden");
+        l1CondPrefix.textContent = "①, ②, ③より、";
+      } else {
+        l1BoxReason3.classList.add("hidden");
+        l1CondPrefix.textContent = "①, ②より、";
+      }
+
+      // Conditions
+      const condOptions = [
+        "選択してください",
+        "2組の角がそれぞれ等しい",
+        "2組の辺の比とその間の角がそれぞれ等しい",
+        "3組の辺の比がすべて等しい"
+      ];
+      populateSelect(l1Condition, condOptions);
+
+      // Conclusions
+      const concOptions = [
+        "選択してください",
+        currentProblem.conclusion,
+        `△${currentProblem.tri1} ＝ △${currentProblem.tri2}`,
+        `△${currentProblem.tri1} ≡ △${currentProblem.tri2}`,
+        `AB ＝ DE`
+      ];
+      populateSelect(l1Conclusion, concOptions);
+    }
+
+    // --- Mode Switching ---
+    function setMode(mode) {
+      currentMode = mode;
+      [tabMode1, tabMode2, tabMode3].forEach((btn, idx) => {
+        if (idx + 1 === mode) {
+          btn.className = "mode-tab flex-1 py-2 px-3 rounded-lg text-xs md:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-teal-600 text-white shadow-sm";
+        } else {
+          btn.className = "mode-tab flex-1 py-2 px-3 rounded-lg text-xs md:text-sm font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-100";
+        }
+      });
+
+      containerMode1.classList.toggle("hidden", mode !== 1);
+      containerMode2.classList.toggle("hidden", mode !== 2);
+      containerMode3.classList.toggle("hidden", mode !== 3);
+    }
+
+    tabMode1.addEventListener("click", () => setMode(1));
+    tabMode2.addEventListener("click", () => setMode(2));
+    tabMode3.addEventListener("click", () => setMode(3));
+
+    // Toggle Marks on Figure
+    btnToggleMarks.addEventListener("click", () => {
+      showMarks = !showMarks;
+      markText.textContent = showMarks ? "図の印を隠す" : "図の印・長さを表示";
+      renderFigure();
+    });
+
+    // Problem Change
+    problemSelect.addEventListener("change", (e) => {
+      const selected = PROBLEMS.find(p => p.id === e.target.value);
+      if (selected) loadProblem(selected);
+    });
+
+    // --- Level 1 Check Logic ---
+    btnCheckL1.addEventListener("click", () => {
+      const t1 = l1Tri1.value;
+      const t2 = l1Tri2.value;
+      const r1 = l1Reason1.value;
+      const e1 = l1Eq1.value;
+      const r2 = l1Reason2.value;
+      const e2 = l1Eq2.value;
+      const cond = l1Condition.value;
+      const conc = l1Conclusion.value;
+
+      const needs3 = currentProblem.reasons.length >= 3;
+      const r3 = l1Reason3.value;
+      const e3 = l1Eq3.value;
+
+      if (!t1 || !t2 || !r1 || !e1 || !r2 || !e2 || !cond || !conc || (needs3 && (!r3 || !e3))) {
+        showL1Feedback("warning", "まだ選ばれていない項目があります。すべてのマスを選択してから答え合わせをしましょう！");
+        return;
+      }
+
+      let errors = [];
+
+      // Check Triangles
+      const validTriOrder = (t1 === currentProblem.tri1 && t2 === currentProblem.tri2);
+      if (!validTriOrder) {
+        errors.push(`・着目する三角形：対応する頂点の順序に注意しましょう（例：△${currentProblem.tri1} と △${currentProblem.tri2}）`);
+      }
+
+      // Check Equations
+      const expectedEqs = currentProblem.reasons.map(r => r.eq);
+      const studentEqs = needs3 ? [e1, e2, e3] : [e1, e2];
+      const allEqsFound = expectedEqs.every(exp => studentEqs.includes(exp));
+
+      if (!allEqsFound) {
+        errors.push("・等しい比や角の式：この問題で言える根拠（比または角）をもう一度見直してみましょう。");
+      }
+
+      // Check Condition
+      if (cond !== currentProblem.condition) {
+        errors.push(`・相似条件：集めた根拠（辺の比や角の組み合わせ）をよく見て、ぴったりの相似条件を選びましょう。`);
+      }
+
+      // Check Conclusion
+      if (conc !== currentProblem.conclusion) {
+        errors.push(`・結論：「${currentProblem.conclusion}」となるはずです。記号『∽』を使っているか確認しましょう。`);
+      }
+
+      if (errors.length === 0) {
+        showL1Feedback("success", `🎉 素晴らしい！完璧です！<br>相似の論理の流れが正しく作れました。次は「Lv.2 標準（ステップ型）」で、自分で文字を入力する練習に進んでみましょう！`);
+      } else {
+        showL1Feedback("error", `惜しい！次のポイントを見直してみよう：<br>${errors.join("<br>")}`);
+      }
+    });
+
+    btnResetL1.addEventListener("click", () => {
+      setupLevel1Options();
+      l1Feedback.className = "hidden";
+    });
+
+    function showL1Feedback(type, message) {
+      l1Feedback.className = "rounded-lg p-4 text-sm leading-relaxed block border";
+      if (type === "success") {
+        l1Feedback.classList.add("bg-emerald-50", "border-emerald-200", "text-emerald-900");
+      } else if (type === "warning") {
+        l1Feedback.classList.add("bg-amber-50", "border-amber-200", "text-amber-900");
+      } else {
+        l1Feedback.classList.add("bg-rose-50", "border-rose-200", "text-rose-900");
+      }
+      l1Feedback.innerHTML = message;
+    }
+
+    // --- Level 2 Step Hints & Validation ---
+    document.querySelectorAll(".btn-step-hint").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const step = e.target.getAttribute("data-hint");
+        const hintBox = document.getElementById(`hint-box-${step}`);
+        if (!hintBox) return;
+
+        hintBox.classList.toggle("hidden");
+        if (!hintBox.classList.contains("hidden")) {
+          if (step === "step1") {
+            hintBox.textContent = `💡 ヒント：問題文や図を見て、相似を言いたい2つの三角形を探そう。対応する頂点の順序に注意して「△… と △… において、」と書きます。`;
+          } else if (step === "step2") {
+            hintBox.textContent = `💡 ヒント：等しい理由には「仮定より」「共通な角だから」「対頂角は等しいから」「直角（90°）だから」などがあります。辺の長さが与えられているときは比を計算してみよう！`;
+          } else if (step === "step3") {
+            hintBox.textContent = `💡 ヒント：集めた根拠は【角が2組】かな？それとも【辺の比が2組とその間の角】かな？あてはまる相似条件を選びましょう。`;
+          } else if (step === "step4") {
+            hintBox.textContent = `💡 ヒント：最後は相似を表す記号「∽」を使って、2つの三角形を結びましょう。`;
+          }
+        }
+      });
+    });
+
+    btnCheckL2.addEventListener("click", () => {
+      const s1 = l2InputStep1.value.trim();
+      const s2 = l2InputStep2.value.trim();
+      const s3 = l2InputStep3.value.trim();
+      const s4 = l2InputStep4.value.trim();
+
+      let hints = [];
+      if (!s1.includes("△") || !s1.includes("において")) {
+        hints.push("・ステップ1：『△』記号と『において、』のキーワードを入れてみましょう。");
+      }
+      if (!s2.includes("①") || !s2.includes("②")) {
+        hints.push("・ステップ2：等しい根拠の式に『… ①』『… ②』と番号をつけましょう。理由（仮定より、共通な角だから〜など）も忘れずに！");
+      }
+      if (!s3.includes("等しい")) {
+        hints.push(`・ステップ3：相似条件の言葉（〜それぞれ等しいから、）を正確に書けているか確認しましょう。`);
+      }
+      if (!s4.includes("∽")) {
+        hints.push("・ステップ4：結論には相似を表す記号『∽』を使いましょう。");
+      }
+
+      l2Feedback.className = "rounded-lg p-4 text-sm leading-relaxed block border";
+      if (hints.length === 0) {
+        l2Feedback.classList.add("bg-emerald-50", "border-emerald-200", "text-emerald-900");
+        l2Feedback.innerHTML = `🌟 とても素晴らしいです！全ステップの型がしっかり揃っています。「この内容をまとめてLv.3へ送る」ボタンを押すと、完全な証明文としてLv.3で確認・編集できます！`;
+      } else {
+        l2Feedback.classList.add("bg-amber-50", "border-amber-200", "text-amber-900");
+        l2Feedback.innerHTML = `アドバイス：<br>${hints.join("<br>")}`;
+      }
+    });
+
+    btnMergeToL3.addEventListener("click", () => {
+      const s1 = l2InputStep1.value.trim();
+      const s2 = l2InputStep2.value.trim();
+      const s3 = l2InputStep3.value.trim();
+      const s4 = l2InputStep4.value.trim();
+
+      if (!s1 && !s2 && !s3 && !s4) {
+        l2Feedback.className = "rounded-lg p-3 text-xs leading-relaxed block border bg-amber-50 border-amber-200 text-amber-900";
+        l2Feedback.textContent = "まだ何も入力されていません。ステップの欄に記入してからLv.3へ送りましょう！";
+        return;
+      }
+
+      const parts = [];
+      if (s1) parts.push(s1);
+      if (s2) parts.push(s2);
+      if (s3) parts.push(s3);
+      if (s4) parts.push(s4);
+
+      l3Textarea.value = parts.join("\n");
+      updateCharCount();
+      setMode(3);
+
+      appendAiMessage(`Lv.2で入力したステップをLv.3にまとめました！文章のつながりや記号をチェックして、完成を目指そう！`);
+    });
+
+    // --- Level 3 Symbol Palette ---
+    document.querySelectorAll(".btn-symbol").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const sym = e.target.textContent;
+        insertAtCursor(l3Textarea, sym);
+        updateCharCount();
+      });
+    });
+
+    function insertAtCursor(textarea, text) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const val = textarea.value;
+      textarea.value = val.substring(0, start) + text + val.substring(end);
+      textarea.selectionStart = textarea.selectionEnd = start + text.length;
+      textarea.focus();
+    }
+
+    function updateCharCount() {
+      charCount.textContent = `${l3Textarea.value.length} 文字`;
+    }
+    l3Textarea.addEventListener("input", updateCharCount);
+
+    // --- AI Socratic Advice Engine (Local Fallback + Gemini API) ---
+    function appendUserMessage(text) {
+      const div = document.createElement("div");
+      div.className = "flex items-start gap-2 text-xs justify-end";
+      div.innerHTML = `
+        <div class="bg-teal-600 text-white rounded-lg p-2.5 shadow-sm max-w-[85%] leading-relaxed">
+          ${escapeHtml(text)}
+        </div>
+      `;
+      aiChatBox.appendChild(div);
+      aiChatBox.scrollTop = aiChatBox.scrollHeight;
+    }
+
+    function appendAiMessage(text, isMarkdown = false) {
+      const div = document.createElement("div");
+      div.className = "flex items-start gap-2 text-xs";
+      div.innerHTML = `
+        <div class="w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">AI</div>
+        <div class="bg-white border border-slate-200 rounded-lg p-2.5 text-slate-700 shadow-sm leading-relaxed max-w-[90%]">
+          ${text}
+        </div>
+      `;
+      aiChatBox.appendChild(div);
+      aiChatBox.scrollTop = aiChatBox.scrollHeight;
+    }
+
+    function escapeHtml(string) {
+      return String(string).replace(/[&<>"']/g, function(s) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[s];
+      });
+    }
+
+    // Quick Ask handler
+    document.querySelectorAll(".btn-quick-ask").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const qType = e.currentTarget.getAttribute("data-question");
+        const studentProof = l3Textarea.value.trim();
+
+        let promptQuestion = "";
+        if (qType === "start") promptQuestion = "書き始めのヒントを教えてください。";
+        else if (qType === "reasons") promptQuestion = "比や角の書き方は合っていますか？";
+        else if (qType === "condition") promptQuestion = "どの相似条件を使えばいいか相談したいです。";
+        else if (qType === "full") promptQuestion = "全体の証明をチェックしてアドバイスをください。";
+
+        appendUserMessage(promptQuestion);
+        await handleAiConsultation(qType, promptQuestion, studentProof);
+      });
+    });
+
+    btnSendCustomAi.addEventListener("click", async () => {
+      const customQ = aiCustomInput.value.trim();
+      if (!customQ) return;
+      const studentProof = l3Textarea.value.trim();
+      aiCustomInput.value = "";
+      appendUserMessage(customQ);
+      await handleAiConsultation("custom", customQ, studentProof);
+    });
+
+    aiCustomInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        btnSendCustomAi.click();
+      }
+    });
+
+    // Main Consultation Function
+    async function handleAiConsultation(qType, question, studentProof) {
+      const loadingDiv = document.createElement("div");
+      loadingDiv.id = "ai-loading";
+      loadingDiv.className = "flex items-center gap-2 text-xs text-slate-400 p-2 italic";
+      loadingDiv.innerHTML = `<span class="animate-spin">⏳</span> AI先生が考えています...`;
+      aiChatBox.appendChild(loadingDiv);
+      aiChatBox.scrollTop = aiChatBox.scrollHeight;
+
+      if (apiKey) {
+        try {
+          const response = await callGeminiApi(question, studentProof);
+          const el = document.getElementById("ai-loading");
+          if (el) el.remove();
+          appendAiMessage(response);
+          return;
+        } catch (err) {
+          console.warn("Gemini API call failed, falling back to local engine:", err);
+        }
+      }
+
+      // Local Socratic Engine
+      setTimeout(() => {
+        const el = document.getElementById("ai-loading");
+        if (el) el.remove();
+
+        const response = generateLocalSocraticAdvice(qType, question, studentProof);
+        appendAiMessage(response);
+      }, 500);
+    }
+
+    // Local Pedagogical Rule Engine for Similarity
+    function generateLocalSocraticAdvice(qType, question, proof) {
+      const prob = currentProblem;
+      const cleanProof = proof.replace(/\s+/g, "");
+
+      if (qType === "start" || cleanProof.length === 0) {
+        return `まずは<strong>「着目する2つの三角形」</strong>を宣言することから始めましょう！<br>
+          問題文の図を見て、相似を言いたい2つの三角形を見つけられますか？<br>
+          書き出しは<strong>『△… と △… において、』</strong>となります。頂点の対応順序に注意して書いてみよう！`;
+      }
+
+      if (qType === "condition") {
+        if (prob.condition.includes("2組の角")) {
+          return `この問題では、図の中に等しい角（直角、仮定の角度、共通な角など）が2組見つかりませんか？<br>
+            2組の角が見つかれば、最もよく使われる<strong>「2組の角がそれぞれ等しい」</strong>という条件が使えますよ！`;
+        } else {
+          return `この問題では辺の長さが与えられていますね！対応する2組の辺の比を計算してみましょう（何対何になるかな？）。<br>
+            比が揃っていてその間の角が等しければ、<strong>「2組の辺の比とその間の角がそれぞれ等しい」</strong>が使えます！`;
+        }
+      }
+
+      if (qType === "reasons") {
+        let feedback = [];
+        if (prob.id === "prob1" || prob.id === "prob4" || prob.id === "prob9") {
+          if (!proof.includes(":") && !proof.includes("比")) {
+            feedback.push("辺の長さから比を求めてみよう！『〇〇 : △△ = 1 : 2』のように簡単な整数の比で表します。");
+          }
+          if (prob.id === "prob4" || prob.id === "prob9") {
+            if (!proof.includes("対頂角")) {
+              feedback.push("向かい合った角（対頂角）に注目してみよう！『対頂角は等しいから、』という理由が使えます。");
+            }
+          }
+        } else {
+          if (!proof.includes("共通")) {
+            feedback.push("2つの三角形で重なっている角（共通な角）がありませんか？『〇〇は共通だから、』と書けますよ。");
+          }
+          if (prob.id === "prob3" || prob.id === "prob5" || prob.id === "prob6") {
+            if (!proof.includes("90") && !proof.includes("垂線") && !proof.includes("仮定")) {
+              feedback.push("直角（90°）や垂線になっている角に注目してみましょう！『仮定より、∠〇〇 = ∠△△ = 90°』と書けます。");
+            }
+          }
+        }
+
+        if (feedback.length === 0) {
+          return `素晴らしい着眼点です！等しい比や角の理由がしっかり書けています。式ごとに『… ①』『… ②』と番号を振るのも忘れないようにしましょう！`;
+        } else {
+          return `ここをチェックしてみてね：<br>${feedback.join("<br>")}`;
+        }
+      }
+
+      // Full check
+      const hasTriangles = proof.includes("△") && proof.includes("において");
+      const hasNumbers = proof.includes("①") && proof.includes("②");
+      const hasCondition = proof.includes("等しいから") || proof.includes("相似条件");
+      const hasConclusion = proof.includes("∽");
+
+      if (hasTriangles && hasNumbers && hasCondition && hasConclusion) {
+        return `🎉 <strong>素晴らしい！相似の証明の骨組みがすべて揃っています！</strong><br>
+          ・三角形の宣言：OK<br>
+          ・根拠と番号：OK<br>
+          ・相似条件：OK<br>
+          ・結論（∽）：OK<br>
+          頂点の対応順序も綺麗に揃っているか、もう一度見直せば完璧です！自信を持って先生に見せられますね！`;
+      }
+
+      let checkList = [];
+      if (!hasTriangles) checkList.push("・書き始め：どの三角形に着目したか（『△… と △… において、』）が抜けています。");
+      if (!hasNumbers) checkList.push("・根拠の整理：理由と式に『①, ②』と番号をつけて引用しやすくしましょう。");
+      if (!hasCondition) checkList.push("・相似条件：『①, ②より、（相似条件）から』という一文を入れましょう。");
+      if (!hasConclusion) checkList.push("・結論：最後に『したがって △… ∽ △…』と結論を結びましょう。");
+
+      return `あと一歩です！次の部分を付け足してみよう：<br>${checkList.join("<br>")}`;
+    }
+
+    // Call Gemini API (1.5 Flash)
+    async function callGeminiApi(question, proof) {
+      const systemInstruction = `あなたは中学校の優しい数学の先生です。現在、中学3年生が「5章 相似な図形」の単元で三角形の相似の証明問題に取り組んでいます。
+対象問題：${currentProblem.title}
+問題文：${currentProblem.text}
+仮定：${currentProblem.hypotheses.join(", ")}
+結論：${currentProblem.conclusion}
+模範的な相似条件：${currentProblem.condition}
+根拠となる理由：${currentProblem.reasons.map(r => r.type + ":" + r.eq).join(", ")}
+
+指導方針（厳格遵守）：
+1. 答えそのもの（完成した証明全文や、ズバリの等式・比・記号順）を生徒に直接教えてはいけません。
+2. 生徒が書いた内容（入力された証明）を褒めつつ、抜けている論理や次のステップについて、ソクラテス式に優しく問いかけてください。
+3. 中学生が理解しやすいよう、平易な言葉と適切な改行を用いて150〜250字程度で簡潔に返答してください。`;
+
+      const prompt = `生徒からの相談：「${question}」\n\n生徒が今書いている証明文：\n"""\n${proof || "（まだ何も書かれていません）"}\n"""`;
+
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          systemInstruction: { parts: [{ text: systemInstruction }] }
+        })
+      });
+
+      if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+      const data = await res.json();
+      const answer = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      return answer ? answer.replace(/\n/g, "<br>") : "うまく回答を生成できませんでした。";
+    }
+
+    // --- Teacher Auth Modal Handler ---
+    btnApiSettings.addEventListener("click", () => {
+      inputAuthPass.value = "";
+      authErrorMsg.classList.add("hidden");
+      modalAuth.classList.remove("hidden");
+      inputAuthPass.focus();
+    });
+
+    const closeAuthModal = () => {
+      modalAuth.classList.add("hidden");
+      authErrorMsg.classList.add("hidden");
+    };
+
+    btnCloseAuth.addEventListener("click", closeAuthModal);
+    btnCancelAuth.addEventListener("click", closeAuthModal);
+
+    formAuth.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const enteredPass = inputAuthPass.value.trim();
+      if (enteredPass === teacherPassword) {
+        closeAuthModal();
+        inputApiKey.value = apiKey;
+        inputChangePass.value = "";
+        modalSettings.classList.remove("hidden");
+      } else {
+        authErrorMsg.classList.remove("hidden");
+        inputAuthPass.select();
+      }
+    });
+
+    // --- Settings Modal Handler ---
+    btnCloseSettings.addEventListener("click", () => modalSettings.classList.add("hidden"));
+    btnSaveApiKey.addEventListener("click", () => {
+      apiKey = inputApiKey.value.trim();
+      const newPass = inputChangePass.value.trim();
+      try {
+        localStorage.setItem("gemini_proof_api_key", apiKey);
+        if (newPass) {
+          teacherPassword = newPass;
+          localStorage.setItem("gemini_teacher_password", newPass);
+        }
+      } catch (e) {}
+      modalSettings.classList.add("hidden");
+      appendAiMessage(apiKey ? "🔑 Gemini APIキーを設定しました！より高度な対話が可能です。" : "設定を更新しました。");
+    });
+
+    btnClearApiKey.addEventListener("click", () => {
+      apiKey = "";
+      inputApiKey.value = "";
+      try {
+        localStorage.removeItem("gemini_proof_api_key");
+      } catch (e) {}
+      modalSettings.classList.add("hidden");
+      appendAiMessage("APIキーを解除しました。内蔵の添削エンジンで動作します。");
+    });
+
+    // --- Guide Modal Handler ---
+    btnShowGuide.addEventListener("click", () => modalGuide.classList.remove("hidden"));
+    btnCloseGuide.addEventListener("click", () => modalGuide.classList.add("hidden"));
+    btnDismissGuide.addEventListener("click", () => modalGuide.classList.add("hidden"));
+
+    // Close modal on click backdrop
+    [modalAuth, modalSettings, modalGuide].forEach(m => {
+      m.addEventListener("click", (e) => {
+        if (e.target === m) m.classList.add("hidden");
+      });
+    });
+
+    // Initial Load
+    loadProblem(PROBLEMS[0]);
+  </script>
+</body>
+</html>
